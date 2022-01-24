@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+  restheart:
+    container_name: restheart
+    image: softinstigate/restheart:latest
+    environment:
+      MONGO_URI: mongodb://mongodb
+    command: ["--envFile", "/opt/restheart/etc/default.properties"]
+    depends_on:
+      - mongodb
+      - mongodb-init
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data/:/data/
+      - ./restheart.yml:/opt/restheart/etc/restheart.yml
+      - ./restheart.properties:/opt/restheart/etc/default.properties
+ 
+  mongodb:
+    container_name: mongodb
+    image: mongo:5.0
+    command: ["--bind_ip_all", "--replSet", "rs0"]
+
+  ### Initialize MongoDB as a single node Replica Set
+  mongodb-init:
+    container_name: mongodb-init  
+    image: mongo:5.0
+    depends_on:
+      - mongodb
+    entrypoint: >-
+      bash -c "for i in {1..10}; do mongo --host mongodb --eval 
+      'if (!rs.status().ok) rs.initiate();' && break || sleep 3; done"
+
+  cantaloupe:
+    container_name: cantaloupe  
+    build:
+      context: ./cantaloupe
+    image: jhu-sheridan-libraries/cantaloupe:5.0.5
+    ports:
+      - "8182:8182"
+    volumes:
+      - ./data/:/images/
+      - ./cantaloupe.properties:/cantaloupe/cantaloupe.properties

@@ -1,0 +1,6 @@
+{
+  "_id": "publicCanReadOida",
+  "roles": ["$unauthenticated"],
+  "predicate": "method(GET) and path-prefix(path='/oida')",
+  "priority": 100
+}
