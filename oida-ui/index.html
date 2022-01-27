@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>OIDA UI</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://unpkg.com/mirador@latest/dist/mirador.min.js"></script>
+  </head>
+  
+  <body>
+    <h1>OIDA UI experiment</h1>
+
+    <div class='mt-4 mx-4'>
+      <form onsubmit="do_search(0); return false">
+        <div class="form-group">
+          <label for="query">Find matching documents</label>
+          <input type="text" size="30" class="form-control" id="query" aria-describedby="queryHelp" placeholder="Enter keywords">
+          <small id="queryHelp" class="form-text text-muted">Enter keywords</small>
+        </div>
+        <button id="query_button" type="submit" class="btn btn-primary">Search</button>
+      </form>
+    </div>
+
+    <h2 class='mt-4'>Search results</h2>
+    
+    <div class='mt-4 mx-4' id="results"></div>
+    
+    <div class='mt-4' id="mirador" style="position: relative; width: 100%; height: 75vh;"></div>
+
+    <script type="text/javascript">
+      var state = {
+          page: 0,
+          page_size: 10,
+          query: "",
+          total_matches: 0
+      }
+
+      // First get total match count and then the results
+      function do_search(page) {
+          state.query = document.getElementById("query").value;
+          state.page = page;
+
+          const count_url = new URL("http://localhost:8080/oida/doc/_size");
+          const query_url = new URL("http://localhost:8080/oida/doc/");
+
+          const filter = {
+              "$text": {"$search": state.query}
+          }
+
+          count_url.searchParams.append("filter", JSON.stringify(filter));
+          query_url.searchParams.append("filter", JSON.stringify(filter));
+          query_url.searchParams.append("page", state.page + 1);
+          query_url.searchParams.append("pagesize", state.page_size);
+
+          fetch(count_url).then(x => x.json()).then(x => {
+              state.total_matches = x._size;
+              fetch(query_url).then(x => x.json()).then(x => display_result(x));   
+          });
+      }
+
+      function display_result(result) {
+          const results_div = document.getElementById('results');
+          const h3 = document.createElement('h3');
+          h3.appendChild(document.createTextNode("Total matches: " + state.total_matches));
+
+          // List of matches
+
+          const ol = document.createElement('ol');
+          let first_li = true;
+          
+          for (const d of result) {
+              let li = document.createElement('li');
+
+              if (first_li) {
+                  li.value = state.page * state.page_size;
+                  first_li = false;
+              }
+              
+              ol.appendChild(li);
+              li.appendChild(document.createTextNode(d._id));
+
+              let img = document.createElement('img');
+              img.src = d.pages[0].iiif_image + '/full/!128,128/0/default.jpg';
+              img.addEventListener("click", ev => {
+                  show_doc(d.iiif_manifest);
+                  return false;
+              });
+
+              li.appendChild(img);
+          }
+
+          // Pagination
+
+          const nav  = document.createElement('nav');
+          nav.ariaLabel = "...";
+
+          const nav_ul  = document.createElement('ul');
+          nav_ul.className = "pagination";
+          nav.appendChild(nav_ul);
+
+          let page_count = state.total_matches / state.page_size;
+          if (state.total_matches % state.page_size != 0) {
+              page_count++;
+          }
+
+          // Previous
+          {
+              const li = document.createElement('li');
+              const a = document.createElement('a');
+              a.className = "page-link";
+              a.href = "#";              
+
+              if (state.page == 0) {
+                  li.className = "page-item disabled";
+                  a.tabIndex = "-1";
+              } else {
+                  handle_pagination_click(a, state.page - 1);                  
+                  li.className = "page-item";                  
+              }
+              a.appendChild(document.createTextNode("Previous"));
+
+              li.appendChild(a);
+              nav_ul.appendChild(li);
+          }
+
+          // Pages
+          
+          for (let i = 0; i < page_count; i++) {
+              let li = document.createElement('li');
+
+              if (i  === state.page) {
+                  li.className = "page-item active";
+              } else {
+                  li.className = "page-item";
+              }
+              
+              const a = document.createElement('a');
+              a.className = "page-link";
+              a.href = "#";
+              a.appendChild(document.createTextNode(i + 1));
+              handle_pagination_click(a, i);
+              
+              li.appendChild(a);
+              nav_ul.appendChild(li);
+          }
+
+          // Next
+          {
+              const li = document.createElement('li');
+              const a = document.createElement('a');
+              a.className = "page-link";
+              a.href = "#";              
+
+              if (state.page + 1 >= page_count ) {
+                  li.className = "page-item disabled";
+                  a.tabIndex = "-1";
+              } else {
+                  li.className = "page-item";
+                  handle_pagination_click(a, state.page + 1);
+              }
+              a.appendChild(document.createTextNode("Next"));
+              
+              li.appendChild(a);
+              nav_ul.appendChild(li);
+          }          
+
+          // Refresh display
+
+          while (results_div.firstChild) {
+              results_div.removeChild(results_div.firstChild);
+          }
+
+          results_div.appendChild(h3);
+          results_div.appendChild(ol);
+          results_div.appendChild(nav);
+      }
+
+      function handle_pagination_click(a, page) {
+          a.addEventListener("click", ev => {
+              do_search(page);
+              return false;
+          });
+      }
+
+      function show_doc(manifest_url) {
+          // TODO Just have one instance and dispatch a Mirador.action
+          Mirador.viewer({
+              id: "mirador",
+              window: {
+                  allowClose: false
+              },
+              workspaceControlPanel: {
+                  enabled: false,
+              },
+              annotations: {
+                  filteredMotivations: ['oa:commenting', 'oa:tagging', 'sc:painting', 'commenting', 'tagging', 'supplementing'],
+              },
+              windows: [
+                  {
+                      manifestId: manifest_url
+                  }
+              ]
+          });
+      }
+    </script>
+  </body>
+</html>
