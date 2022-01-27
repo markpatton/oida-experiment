@@ -13,11 +13,11 @@
   <body>
     <h1>OIDA UI experiment</h1>
 
-    <div class='mt-4 mx-4'>
+    <div class='mt-4 mx-4' style="width: 30rem;">
       <form onsubmit="do_search(0); return false">
         <div class="form-group">
           <label for="query">Find matching documents</label>
-          <input type="text" size="30" class="form-control" id="query" aria-describedby="queryHelp" placeholder="Enter keywords">
+          <input type="text" class="form-control" id="query" aria-describedby="queryHelp" placeholder="Enter keywords">
           <small id="queryHelp" class="form-text text-muted">Enter keywords</small>
         </div>
         <button id="query_button" type="submit" class="btn btn-primary">Search</button>
@@ -28,7 +28,7 @@
     
     <div class='mt-4 mx-4' id="results"></div>
     
-    <div class='mt-4' id="mirador" style="position: relative; width: 100%; height: 75vh;"></div>
+    <div class='mt-4' id="mirador"></div>
 
     <script type="text/javascript">
       var state = {
@@ -62,18 +62,20 @@
       }
 
       function display_result(result) {
-          const results_div = document.getElementById('results');
           const h3 = document.createElement('h3');
           h3.appendChild(document.createTextNode("Total matches: " + state.total_matches));
 
           // List of matches
 
           const ol = document.createElement('ol');
+          ol.className = "list-group";
+          ol.style = "width: 20rem;"
+
           let first_li = true;
           
           for (const d of result) {
               let li = document.createElement('li');
-
+              li.className = "list-group-item";
               if (first_li) {
                   li.value = state.page * state.page_size;
                   first_li = false;
@@ -169,13 +171,21 @@
 
           // Refresh display
 
+          const results_div = document.getElementById('results');
+          
           while (results_div.firstChild) {
               results_div.removeChild(results_div.firstChild);
           }
 
+          while (results_div.firstChild) {
+              results_div.removeChild(results_div.firstChild);
+          }
+          
           results_div.appendChild(h3);
           results_div.appendChild(ol);
           results_div.appendChild(nav);
+
+          document.getElementById('mirador').style = "display: none;";
       }
 
       function handle_pagination_click(a, page) {
@@ -186,6 +196,8 @@
       }
 
       function show_doc(manifest_url) {
+          document.getElementById('mirador').style = "position: relative; width: 100%; height: 75vh; display: block;";
+          
           // TODO Just have one instance and dispatch a Mirador.action
           Mirador.viewer({
               id: "mirador",
