@@ -1,11 +1,14 @@
 package edu.jhu.library.oid.core;
 
+
+// Coordinates and lengths are percentages of containing image dimension.
+
 public class OidaPageAnnotation {
 	private final String text;
-	private final int x, y;
-	private final int width, height;
-	
-	public OidaPageAnnotation(String text, int x, int y, int width, int height) {
+	private final double x, y;
+	private final double width, height;
+
+	public OidaPageAnnotation(String text, double x, double y, double width, double height) {
 		this.text = text;
 		this.x = x;
 		this.y = y;
@@ -17,19 +20,19 @@ public class OidaPageAnnotation {
 		return text;
 	}
 
-	public int getX() {
+	public double getX() {
 		return x;
 	}
 
-	public int getY() {
+	public double getY() {
 		return y;
 	}
 
-	public int getWidth() {
+	public double getWidth() {
 		return width;
 	}
 
-	public int getHeight() {
+	public double getHeight() {
 		return height;
 	}
 }

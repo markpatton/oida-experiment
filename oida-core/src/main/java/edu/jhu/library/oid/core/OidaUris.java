@@ -63,6 +63,11 @@ public class OidaUris {
 	}
 
 	public String getIiifCanvasTarget(OidaDocument doc, OidaPage p, OidaPageAnnotation a) {
-		return getIiifCanvasUri(doc, p) + "#xywh=" + a.getX() + "," + a.getY() + "," + a.getWidth() + "," + a.getHeight();
+		int x = (int) Math.round(a.getX() * p.getWidth());
+		int y = (int) Math.round(a.getY() * p.getHeight());
+		int width = (int) Math.round(a.getWidth() * p.getWidth());
+		int height = (int) Math.round(a.getHeight() * p.getHeight());
+		
+		return getIiifCanvasUri(doc, p) + "#xywh=" + x + "," + y + "," + width + "," + height;
 	}
 }

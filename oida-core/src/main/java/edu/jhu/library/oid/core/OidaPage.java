@@ -1,6 +1,5 @@
 package edu.jhu.library.oid.core;
 
-import java.nio.file.Path;
 import java.util.List;
 
 /**

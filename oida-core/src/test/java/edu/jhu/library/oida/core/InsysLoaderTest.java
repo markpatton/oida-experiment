@@ -43,9 +43,9 @@ public class InsysLoaderTest {
 		OidaPageAnnotation a = page.getWordAnnotations().get(0);
 		
 		assertEquals("test.txt", a.getText());
-		assertEquals(43, a.getX());
-		assertEquals(58, a.getY());
-		assertEquals(48, a.getWidth());
-		assertEquals(7, a.getHeight());
+		assertEquals(90, Math.round(a.getX() * page.getWidth()));
+		assertEquals(122, Math.round(a.getY() * page.getHeight()));
+		assertEquals(100, Math.round(a.getWidth() * page.getWidth()));
+		assertEquals(13, Math.round(a.getHeight() * page.getHeight()));
 	}
 }

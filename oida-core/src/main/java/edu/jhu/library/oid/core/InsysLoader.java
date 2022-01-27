@@ -90,7 +90,8 @@ public class InsysLoader implements OidaLoader {
 	private static class OcrLayoutXmlHandler extends DefaultHandler {
 		private final LinkedList<List<OidaPageAnnotation>> page_word_annos;
 		private final StringBuilder text;
-		private int min_x, min_y, max_x, max_y;
+		private double min_x, min_y, max_x, max_y;
+		private double page_width, page_height;
 
 		/**
 		 * @param word_annos_list Used to return per page word annotation lists
@@ -106,14 +107,14 @@ public class InsysLoader implements OidaLoader {
 		}
 
 		// Numbers are floating point, but we want integers.
-		private int get_int(Attributes attributes, String name) throws SAXException {
+		private double get_double(Attributes attributes, String name) throws SAXException {
 			String s = attributes.getValue(name);
 
 			if (s == null) {
 				throw new SAXException("Required attribute missing: " + name);
 			}
 
-			return (int) Math.round(Double.parseDouble(s));
+			return Double.parseDouble(s);
 		}
 
 		@Override
@@ -121,11 +122,13 @@ public class InsysLoader implements OidaLoader {
 				throws SAXException {
 			if (qName.equals("page")) {
 				page_word_annos.add(new ArrayList<>());
+				page_width = get_double(attributes, "width");
+				page_height = get_double(attributes, "height");				
 			} else if (qName.equals("word")) {
-				min_x = get_int(attributes, "xMin");
-				min_y = get_int(attributes, "yMin");
-				max_x = get_int(attributes, "xMax");
-				max_y = get_int(attributes, "yMax");
+				min_x = get_double(attributes, "xMin");
+				min_y = get_double(attributes, "yMin");
+				max_x = get_double(attributes, "xMax");
+				max_y = get_double(attributes, "yMax");
 			}
 
 			text.setLength(0);
@@ -134,8 +137,13 @@ public class InsysLoader implements OidaLoader {
 		@Override
 		public void endElement(String uri, String localName, String qName) throws SAXException {
 			if (qName.equals("word")) {
+				double x = min_x / page_width;
+				double y = min_y / page_height;
+				double width = (max_x - min_x) / page_width;
+				double height = (max_y - min_y) / page_height;
+				
 				page_word_annos.getLast().add(
-						new OidaPageAnnotation(text.toString().trim(), min_x, min_y, max_x - min_x, max_y - min_y));
+						new OidaPageAnnotation(text.toString().trim(), x, y, width, height));
 			}
 		}
 	}
