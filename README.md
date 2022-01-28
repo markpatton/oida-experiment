@@ -3,6 +3,10 @@
 This projects indexes PDFs, splits them into images, makes the OCR text searchable, and the documents accessible with a IIIF viewer.
 The stack consisting of MongoDB, RESTHeart, Cantaloupe, some Java tools, and a simple JavaScript viewer which uses Mirador.
 
+# Architecture
+
+![Architecture Diagram](arch.png)
+
 # Build
 
 The Java tool scan be built using maven with:
