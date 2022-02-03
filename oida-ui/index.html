@@ -14,7 +14,7 @@
     <h1>OIDA UI experiment</h1>
 
     <div class='mt-4 mx-4' style="width: 30rem;">
-      <form onsubmit="do_search(0); return false">
+      <form onsubmit="do_search(0); return false;">
         <div class="form-group">
           <label for="query">Find matching documents</label>
           <input type="text" class="form-control" id="query" aria-describedby="queryHelp" placeholder="Enter keywords">
@@ -31,7 +31,7 @@
     <div class='mt-4' id="mirador"></div>
 
     <script type="text/javascript">
-      var state = {
+      const state = {
           page: 0,
           page_size: 10,
           query: "",
@@ -43,8 +43,8 @@
           state.query = document.getElementById("query").value;
           state.page = page;
 
-          const count_url = new URL("http://localhost:8080/oida/doc/_size");
-          const query_url = new URL("http://localhost:8080/oida/doc/");
+          const count_url = new URL("/oida/doc/_size", window.location.origin);
+          const query_url = new URL("/oida/doc/", window.location.origin);
 
           const filter = {
               "$text": {"$search": state.query}
@@ -61,47 +61,51 @@
           });
       }
 
+      function create_element(parent, name, classes = "") {
+          const el = document.createElement(name);
+          el.className = classes;
+          parent.appendChild(el);
+          return el;
+      }
+      
       function display_result(result) {
-          const h3 = document.createElement('h3');
+          const results_div = document.getElementById("results");
+
+          // Clear results
+          while (results_div.firstChild) {
+              results_div.removeChild(results_div.firstChild);
+          }
+
+          const h3 = create_element(results_div, "h3");
           h3.appendChild(document.createTextNode("Total matches: " + state.total_matches));
 
           // List of matches
 
-          const ol = document.createElement('ol');
-          ol.className = "list-group";
-          ol.style = "width: 20rem;"
-
-          let first_li = true;
+          const ul = create_element(results_div, "ul", "list-group");
+          ul.style = "width: 20rem;"
+          let num = (state.page * state.page_size) + 1;
           
           for (const d of result) {
-              let li = document.createElement('li');
-              li.className = "list-group-item";
-              if (first_li) {
-                  li.value = state.page * state.page_size;
-                  first_li = false;
-              }
+              let li = create_element(ul, "li", "list-group-item");
+
+              create_element(li, "strong").appendChild(document.createTextNode(num++ + ". "));
               
-              ol.appendChild(li);
               li.appendChild(document.createTextNode(d._id));
 
-              let img = document.createElement('img');
+              let img = create_element(li, "img");
               img.src = d.pages[0].iiif_image + '/full/!128,128/0/default.jpg';
               img.addEventListener("click", ev => {
                   show_doc(d.iiif_manifest);
                   return false;
               });
-
-              li.appendChild(img);
           }
 
           // Pagination
 
-          const nav  = document.createElement('nav');
+          const nav  = create_element(results_div, "nav");
           nav.ariaLabel = "...";
 
-          const nav_ul  = document.createElement('ul');
-          nav_ul.className = "pagination";
-          nav.appendChild(nav_ul);
+          const nav_ul  = create_element(nav, "ul", "pagination");
 
           let page_count = state.total_matches / state.page_size;
           if (state.total_matches % state.page_size != 0) {
@@ -110,9 +114,8 @@
 
           // Previous
           {
-              const li = document.createElement('li');
-              const a = document.createElement('a');
-              a.className = "page-link";
+              const li = create_element(nav_ul, "li");
+              const a = create_element(li, "a", "page-link");
               a.href = "#";              
 
               if (state.page == 0) {
@@ -123,9 +126,6 @@
                   li.className = "page-item";                  
               }
               a.appendChild(document.createTextNode("Previous"));
-
-              li.appendChild(a);
-              nav_ul.appendChild(li);
           }
 
           // Pages
@@ -138,22 +138,19 @@
               } else {
                   li.className = "page-item";
               }
-              
-              const a = document.createElement('a');
-              a.className = "page-link";
+
+              const a = create_element(li, "a", "page-link");              
               a.href = "#";
               a.appendChild(document.createTextNode(i + 1));
               handle_pagination_click(a, i);
               
-              li.appendChild(a);
               nav_ul.appendChild(li);
           }
 
           // Next
           {
-              const li = document.createElement('li');
-              const a = document.createElement('a');
-              a.className = "page-link";
+              const li = create_element(nav_ul, "li");
+              const a = create_element(li, "a", "page-link");
               a.href = "#";              
 
               if (state.page + 1 >= page_count ) {
@@ -164,26 +161,7 @@
                   handle_pagination_click(a, state.page + 1);
               }
               a.appendChild(document.createTextNode("Next"));
-              
-              li.appendChild(a);
-              nav_ul.appendChild(li);
           }          
-
-          // Refresh display
-
-          const results_div = document.getElementById('results');
-          
-          while (results_div.firstChild) {
-              results_div.removeChild(results_div.firstChild);
-          }
-
-          while (results_div.firstChild) {
-              results_div.removeChild(results_div.firstChild);
-          }
-          
-          results_div.appendChild(h3);
-          results_div.appendChild(ol);
-          results_div.appendChild(nav);
 
           document.getElementById('mirador').style = "display: none;";
       }
