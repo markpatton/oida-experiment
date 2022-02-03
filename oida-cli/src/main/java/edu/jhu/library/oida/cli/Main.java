@@ -24,11 +24,14 @@ public class Main {
 			System.exit(1);
 		}
 
+		String base_data_url = System.getProperty("oida.base_data_url", "http://localhost:8080/data/");
+		String base_image_url = System.getProperty("oida.base_image_url", "http://localhost:8182/iiif/3/");
+		
+		OidaUris uris = new OidaUris(base_data_url, base_image_url);
+
 		switch (args[0]) {
 		case "write-iiif": {
 			Path dir = Paths.get(args[1]);
-
-			OidaUris uris = new OidaUris();
 			OidaLoader loader = new InsysLoader(dir);
 
 			Files.walk(dir).filter(p -> p.getFileName().toString().endsWith(".pdf")).forEach(p -> {
@@ -59,9 +62,7 @@ public class Main {
 
 		case "serialize-restheart": {
 			Path dir = Paths.get(args[1]);
-
 			OidaLoader loader = new InsysLoader(dir);
-			OidaUris uris = new OidaUris();
 
 			Stream<OidaDocument> docs = Files.walk(dir).filter(p -> p.getFileName().toString().endsWith(".pdf")).map(p -> {
 				try {

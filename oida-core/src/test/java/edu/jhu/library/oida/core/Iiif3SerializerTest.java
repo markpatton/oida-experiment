@@ -31,7 +31,7 @@ public class Iiif3SerializerTest {
 		OidaLoader loader = new InsysLoader(Paths.get(TEST_INSYS_DIR));
 		
 		OidaDocument doc = loader.loadDocument(Paths.get(TEST_DOC_DIR));
-		OidaUris uris = new OidaUris();
+		OidaUris uris = new OidaUris("/data/", "http://example.com/iiif/");
 		
 		Iiif3Serializer serializer = new Iiif3Serializer(uris, loader);
 		

@@ -41,6 +41,9 @@ Produce an ingest file for the database:
 java -jar oida-cli/target/oida-cli-0.1-jar-with-dependencies.jar serialize-restheart data >data.json
 ```
 
+Note that for the Java tool you can set the base urls used for static data and IIIF images by using the system properties 
+`oida.base_data_url` and `oida.base_data_url` respectively.
+
 # Start the stack
 
 ```
@@ -60,11 +63,5 @@ curl --user admin:secret -H "Content-Type:application/json" localhost:8080/oida/
 
 # Web interface
 
-Copy oida-ui into data/ to avoid some CORS issues.
-
-```
-cp -r oida-ui data/
-```
-
-Access the interface at `http://localhost:8080/data/oida-ui/index.html'.
+The simple web site in oida-ui is bind mounted into restheart and made available at http://localhost:8080/oida-ui/.
 

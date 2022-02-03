@@ -29,7 +29,7 @@ public class RestheartSerializerTest {
 	public void testSerialization() throws IOException {
 		OidaLoader loader = new InsysLoader(Paths.get(TEST_INSYS_DIR));
 		OidaDocument doc = loader.loadDocument(Paths.get(TEST_DOC_DIR));
-		OidaUris uris = new OidaUris();
+		OidaUris uris = new OidaUris("/data/", "http://example.com/iiif/");
 		
 		RestheartSerializer serializer = new RestheartSerializer(uris, loader);
 		

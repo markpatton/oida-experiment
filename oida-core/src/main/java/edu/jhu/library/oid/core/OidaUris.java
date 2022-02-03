@@ -3,25 +3,32 @@ package edu.jhu.library.oid.core;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-// TODO Make URIs nicer.
-
 public class OidaUris {
-	private String base_url = "http://localhost:8080/data/";
-	private String image_server_base_url = "http://localhost:8182/iiif/3/";
+	private final String base_data_url;
+	private final String base_image_url;
+
+	/**
+	 * @param base_data_url  Base URL to access static data. Should probably abe absolute.
+	 * @param base_image_url Base URL to IIIF image server. Must be absolute.
+	 */
+	public OidaUris(String base_data_url, String base_image_url) {
+		this.base_data_url = base_data_url.endsWith("/") ? base_data_url : base_data_url + "/";
+		this.base_image_url = base_image_url.endsWith("/") ? base_image_url : base_image_url + "/";
+	}
 
 	private String get_base_url(OidaDocument doc) {
-		return base_url + doc.getPath() + "/";
+		return base_data_url + doc.getPath() + "/";
 	}
-	
+
 	public String getIiifManifestUri(OidaDocument doc) {
-		String s = URLEncoder.encode(getIiifManifestName(doc), StandardCharsets.UTF_8);		
+		String s = URLEncoder.encode(getIiifManifestName(doc), StandardCharsets.UTF_8);
 		return get_base_url(doc) + s;
 	}
-	
+
 	public String getIiifManifestName(OidaDocument doc) {
 		return doc.getId() + "-manifest.json";
 	}
-	
+
 	public String getIiifCanvasUri(OidaDocument doc, OidaPage page) {
 		return get_base_url(doc) + "canvas/" + page.getIndex();
 	}
@@ -29,12 +36,12 @@ public class OidaUris {
 	public String getIiifPaintingAnnotationPageUri(OidaDocument doc, OidaPage page) {
 		return get_base_url(doc) + "painting/" + page.getIndex();
 	}
-	
+
 	public String getIiifTextAnnotationPageUri(OidaDocument doc, OidaPage page) {
 		String s = URLEncoder.encode(getIiifTextAnnotationPageName(doc, page), StandardCharsets.UTF_8);
 		return get_base_url(doc) + s;
 	}
-	
+
 	public String getIiifTextAnnotationPageName(OidaDocument doc, OidaPage page) {
 		return doc.getId() + "-page-" + page.getIndex() + ".json";
 	}
@@ -45,7 +52,7 @@ public class OidaUris {
 
 	public String getIiifImageBaseUri(OidaDocument doc, OidaPage page) {
 		String s = URLEncoder.encode(doc.getPath() + "/" + page.getImageName(), StandardCharsets.UTF_8);
-		return image_server_base_url + s;
+		return base_image_url + s;
 	}
 
 	public String getJpegImageUri(OidaDocument doc, OidaPage page) {
@@ -67,7 +74,7 @@ public class OidaUris {
 		int y = (int) Math.round(a.getY() * p.getHeight());
 		int width = (int) Math.round(a.getWidth() * p.getWidth());
 		int height = (int) Math.round(a.getHeight() * p.getHeight());
-		
+
 		return getIiifCanvasUri(doc, p) + "#xywh=" + x + "," + y + "," + width + "," + height;
 	}
 }
