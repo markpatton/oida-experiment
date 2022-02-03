@@ -52,10 +52,13 @@ instance-name: {{{instance-name}}}
  # max-queue-size (optional, default 0) Controls the number of connections to create per thread.
  # connections-ttl (optional, default -1) Connections Time to Live in seconds.
  # problem-server-retry (optional, default 10) Time in seconds between retries for problem server.
-#proxies:
-#   - location: /anything
-#     proxy-pass: https://httpbin.org/anything
-#     name: anything
+
+# This doesn't quite work. Cantaloupe does not use the correct base url in info.json.
+# proxies:
+#  - location: /image
+#    proxy-pass: http://cantaloupe:8182/iiif/3
+#    name: cantaloupe
+ 
 
 #### MongoDB
 
@@ -135,6 +138,10 @@ mongo-mounts:
 static-resources-mounts:
   - what: /data
     where: /data
+    welcome-file: index.html
+    embedded: false
+  - what: /oida-ui
+    where: /oida-ui
     welcome-file: index.html
     embedded: false
 
