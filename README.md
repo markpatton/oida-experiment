@@ -63,5 +63,15 @@ curl --user admin:secret -H "Content-Type:application/json" localhost:8080/oida/
 
 # Web interface
 
+The web application in oida-ui can be built with:
+```
+npm install
+```
+
+You may need to force the npm install to get past some dependency conflicts between mirador and mirador-annotation.
+
 The simple web site in oida-ui is bind mounted into restheart and made available at http://localhost:8080/oida-ui/.
+(Having the UI on the same domain as the static data also served out by restheart gets around some CORS issues.)
+
+
 
