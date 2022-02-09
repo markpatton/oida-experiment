@@ -42,7 +42,7 @@ java -jar oida-cli/target/oida-cli-0.1-jar-with-dependencies.jar serialize-resth
 ```
 
 Note that for the Java tool you can set the base urls used for static data and IIIF images by using the system properties 
-`oida.base_data_url` and `oida.base_data_url` respectively.
+`oida.base_data_url` and `oida.base_image_url` respectively.
 
 # Start the stack
 
@@ -66,6 +66,7 @@ curl --user admin:secret -H "Content-Type:application/json" localhost:8080/oida/
 The web application in oida-ui can be built with:
 ```
 npm install
+npm run build
 ```
 
 You may need to force the npm install to get past some dependency conflicts between mirador and mirador-annotation.
