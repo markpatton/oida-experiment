@@ -48,6 +48,14 @@ public class Iiif3Serializer {
 		g.writeEnd();
 		g.writeEnd();
 
+		g.writeStartArray("service");
+		g.writeStartObject();
+		g.write("@context", "http://iiif.io/api/search/1/context.json");
+		g.write("id", uris.getIiifSearchService(doc));
+		g.write("profile", "http://iiif.io/api/search/1/search");
+		g.writeEnd();
+		g.writeEnd();
+		
 		// TODO navDate, add metadata once we have it
 
 		g.writeStartArray("items");

@@ -77,4 +77,9 @@ public class OidaUris {
 
 		return getIiifCanvasUri(doc, p) + "#xywh=" + x + "," + y + "," + width + "," + height;
 	}
+
+	// TODO Probably have a separate base url for search
+	public String getIiifSearchService(OidaDocument doc) {
+		return get_base_url(doc) + "search/";
+	}
 }
