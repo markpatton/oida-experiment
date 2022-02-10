@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Universal Viewer test</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/universalviewer@next/dist/uv.css"
+    />
+    <script
+      type="application/javascript"
+      src="https://cdn.jsdelivr.net/npm/universalviewer@next/dist/umd/UV.js"
+    ></script>
+    <style>
+      #uv {
+        width: 924px;
+        height: 668px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <form id='viewform'>
+        <div>
+          <label for="manifestinput">Enter manifest URL</label>
+          <input type="text" id="manifesturl" aria-describedby="queryHelp" placeholder="URL" size="70">
+        </div>
+        <button type="submit">View</button>
+      </form>
+    </div>
+    
+    <div class="uv" id="uv"></div>
+
+    <script>
+      document.getElementById("viewform").addEventListener("submit", ev => {
+          ev.preventDefault();
+
+          const urlAdaptor = new UV.URLAdaptor();
+          const data = urlAdaptor.getInitialData({
+              manifest: document.getElementById("manifesturl").value
+          });
+
+          uv = UV.init("uv", data);
+          urlAdaptor.bindTo(uv);
+
+          return false;
+      });
+    </script>
+  </body>
+</html>

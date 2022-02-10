@@ -7,6 +7,8 @@ The stack consisting of MongoDB, RESTHeart, Cantaloupe, some Java tools, and a s
 
 ![Architecture Diagram](arch.png)
 
+The command line tools process a set of PDFs and makes them available on a website. MongoDB is used to store information about the documents and search the OCR'd text. RESTHeart is a REST API on top of MongoDB. It manages access to MongoDB and also static data such as PDF's and IIIF representations of those PDF's. An index on the OCR'd text is created to allow keyword searching. Cantaloupe is an image server which implements the IIIF Image API. The command line tools split the PDF's into images to make them available to Cantaloupe. (For this demo, JPEG format is used. In production, JP2 using the Kakadu image library would be more performant.) Every image of a PDF can be accessed by its own URL. The demo website lets the documents be searched and then viewed with Mirador 3, a IIIF viewer.
+
 # Build
 
 The Java tool scan be built using maven with:
@@ -72,7 +74,8 @@ npm run build
 You may need to force the npm install to get past some dependency conflicts between mirador and mirador-annotation.
 
 The simple web site in oida-ui is bind mounted into restheart and made available at http://localhost:8080/oida-ui/.
-(Having the UI on the same domain as the static data also served out by restheart gets around some CORS issues.)
+Having the UI on the same domain as the static data also served out by restheart gets around some CORS issues. Make sure
+you visit oida-ui using the same domain as the static data.
 
-
-
+You can also visit http://localhost:8080/oida-ui/uv.html to see a simple demo of Universal Viewer.
+Use a manifest URL found in the main demo to try it.
