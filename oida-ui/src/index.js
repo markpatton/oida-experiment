@@ -30,7 +30,6 @@ const mirador_viewer = Mirador.viewer({
 
 document.getElementById("queryform").addEventListener("submit", ev => {
     ev.preventDefault();
-    console.log('blah');
     do_search(0);
     return false;
 });
