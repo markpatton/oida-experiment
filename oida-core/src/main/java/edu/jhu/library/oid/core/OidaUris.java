@@ -82,4 +82,8 @@ public class OidaUris {
 	public String getIiifSearchService(OidaDocument doc) {
 		return get_base_url(doc) + "search/";
 	}
+
+	public String getJpegThumbUri(OidaDocument doc, OidaPage page) {
+		return getIiifImageBaseUri(doc, page) + "/full/128,/0/default.jpg";		
+	}
 }

@@ -57,7 +57,8 @@ public class Iiif3Serializer {
 		g.writeEnd();
 		
 		// TODO navDate, add metadata once we have it
-
+		// TODO thumbnail
+		
 		g.writeStartArray("items");
 		loader.streamPages(doc).forEach(p -> {
 			write_canvas(doc, p, g);
@@ -80,6 +81,8 @@ public class Iiif3Serializer {
 		g.write("width", page.getWidth());
 		g.write("height", page.getHeight());
 
+		write_thumbnail(doc, page, g);
+		
 		g.writeStartArray("items");
 		g.writeStartObject();
 		g.write("id", uris.getIiifPaintingAnnotationPageUri(doc, page));
@@ -101,7 +104,7 @@ public class Iiif3Serializer {
 		g.writeStartObject();
 		g.write("id", uris.getIiifImageBaseUri(doc, page));
 		g.write("type", "ImageService3");
-		g.write("profile", "level1");
+		g.write("profile", "level2");
 		g.writeEnd();
 		g.writeEnd();
 		g.writeEnd();
@@ -121,6 +124,24 @@ public class Iiif3Serializer {
 		g.writeEnd();
 	}
 
+	private void write_thumbnail(OidaDocument doc, OidaPage p, JsonGenerator g) {
+		g.writeStartArray("thumbnail");
+		g.writeStartObject();
+		g.write("id", uris.getJpegThumbUri(doc, p));
+		g.write("type", "Image");
+		g.write("format", "image/jpeg");
+		g.writeStartArray("service");
+		g.writeStartObject();
+		g.write("id", uris.getIiifImageBaseUri(doc, p));
+		g.write("type", "ImageService3");
+		g.write("profile", "level2");
+		g.writeEnd();
+		g.writeEnd();
+		
+		g.writeEnd();
+		g.writeEnd();
+	}
+	
 	private void write_annotations(OidaDocument doc, OidaPage p, JsonGenerator g) {
 		g.writeStartObject();
 		g.write("@context", IIIF_PRESENTATION_CONTEXT);
